@@ -14,11 +14,12 @@
 			}
 			#screen{
 				padding: 0px 10px;
-				min-height: 70px; max-width: 100%; background: #F63D13;
+				min-height: 70px;	min-width: 100%; background: #F63D13;
 				border-radius: 30px; line-height: 70px; color: white;
 				font-size: 35px; font-weight: bold; letter-spacing: 2px;
 				text-shadow: 0px 3px 2px rgba(0,0,0,0.2); word-wrap: break-word;
-			}
+				border: none; 
+			} #screen:focus { outline: none; }
 			#keyboard{
 				margin: 20px 0px; clear: both;
 			}
@@ -26,12 +27,14 @@
 				width: 75px; height: 70px; margin: 15px 20px ; float: left;
 				border-radius: 50%; text-align: center; line-height: 75px;
 				font-size: 30px; font-weight: bold; box-shadow: 0px 10px 10px rgba(0,0,0,0.3);
+				ransition: backgrond-color 1s;
 			}
-			/*
+			
 			.button:hover{
 				position: relative;
 				top: 5px; box-shadow: 0px 5px rgba(0,0,0,0.25);
-			}*/
+				transition: background-color 1s;
+			}
 			.button:hover{
 				background: #e2e0e0;
 			}
@@ -39,8 +42,7 @@
 	</head>
 	<body>
 		<div id="calc">
-			<div id="screen">
-			</div>
+			<input id="screen" type="text" placeholder="type an equation ..." autofocus />
 			<div id="keyboard">
 				<div id="clear">AC</div>
 				<div id="back">CE</div>
@@ -66,6 +68,7 @@
 			
 			<script>
 				window.onload = function() {
+					
 					/* declerations */
 					var i, l, buttons, screen, clear;
 					operations = []; clear = false; 
@@ -75,18 +78,36 @@
 					l = buttons.length;
 					for(i = 0 ; i < l; i++){
 						if( buttons[i].className === 'number'){ // Is a Number ?
-							buttons[i].addEventListener('click', completeNumber( buttons[i].innerHTML ) ); // add number to screen
+							buttons[i].addEventListener('click', completeNumber( buttons[i].innerHTML)  ); // add number to screen
 						} else{
 							buttons[i].addEventListener('click', makeOperation ( buttons[i].innerHTML ) );
 						}
+					//	addEventListener('click', clickAnimation(i) );
 						buttons[i].className += " button";
 					}
-						
+					/*function clickAnimation(index){
+						return function(){
+							buttons[index].style.color = "black";
+							buttons[index].style.top = "5px";
+							buttons[index].style.boxShadow = "0px 5px rgba(0,0,0,0.25)";
+						};
+					}*/
 					
+					screen.addEventListener('keypress', compete);	
+					function compete(){ // if the user presses Enter
+						clearScreen();
+						console.log("key pressed");
+						if(event.which === 13 || event.keyCode === 13) {
+							console.log("enter pressed");
+							var x = makeOperation('=');
+							x('=');
+							
+						}
+					}
 					function completeNumber(val){ 
 						return function(){
 							clearScreen();
-							screen.innerHTML += val;
+							screen.value += val;
 						};
 					}
 					
@@ -95,19 +116,19 @@
 							clearScreen();
 							if( operation === '='){
 								try{
-									screen.innerHTML = eval(screen.innerHTML);
+									screen.value = eval(screen.value);
 								} catch(err) {	
 									adjustMinimize();
-									screen.innerHTML = "Please unter a proper equation";
+									screen.value = "Please enter a proper equation";
 									clear = true;
 								}
 							} else if(operation === 'CE'){
-								screen.innerHTML = screen.innerHTML.substring(0, screen.innerHTML.length - 1);
+								screen.value = screen.value.substring(0, screen.value.length - 1);
 							} else if(operation === 'AC'){
-								screen.innerHTML = "";
+								screen.value = "";
 							}
 							else {
-								screen.innerHTML += operation;
+								screen.value += operation;
 							}
 						}
 					}
@@ -118,8 +139,8 @@
 					
 					function clearScreen(){
 						screen.style.fontSize = "35px";
-						if(clear === true || screen.innerHTML === "undefined"){
-							screen.innerHTML = "";
+						if(clear === true || screen.value === "undefined"){
+							screen.value = "";
 							clear = false;
 						}
 					}
